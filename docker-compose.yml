@@ -1,17 +1,55 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: pose_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-pose_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pose_network
+
   api:
-    build: .
     image: ghcr.io/richard-ia86/pose_api:latest
     container_name: pose_api
     restart: always
+    depends_on:
+      - db
     ports:
       - "8000:8000"
     environment:
-      - DB_HOST=172.17.0.1
+      - DB_HOST=db
       - DB_PORT=5432
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_NAME=${DB_NAME:-pose_db}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    networks:
+      - pose_network
+
+  frontend:
+    image: ghcr.io/richard-ia86/pose_frontend:latest
+    container_name: pose_frontend
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    networks:
+      - pose_network
+
+volumes:
+  postgres_data:
+
+networks:
+  pose_network:
+    driver: bridge
