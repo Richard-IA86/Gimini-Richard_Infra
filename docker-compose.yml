@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    image: ghcr.io/richard-ia86/pose_api:latest
+    container_name: pose_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=172.17.0.1
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
