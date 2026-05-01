@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  api:
+    # GitHub Action construirá y subirá esta imagen, y Hetzner la descargará
+    image: ghcr.io/richard-ia86/pose_api:latest
+    container_name: pose_api
+    restart: always
+    environment:
+      # Conexión a la DB nativa en el servidor vía WireGuard (10.10.0.1)
+      - DB_HOST=10.10.0.1
+      - DB_PORT=5432
+      - DB_USER=pose_app
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=pose_db
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+    networks:
+      - pose_network
+    labels:
+      - "traefik.enable=true"
+      # La API responderá en api.gestionpose.com.ar
+      - "traefik.http.routers.api.rule=Host(`api.gestionpose.com.ar`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls.certresolver=myresolver"
+      - "traefik.http.services.api.loadbalancer.server.port=8000"
+
+  frontend:
+    # Igual que la API, la imagen vendrá de GitHub
+    image: ghcr.io/richard-ia86/pose_frontend:latest
+    container_name: pose_frontend
+    restart: always
+    environment:
+      # El frontend consumirá la API desde la URL pública
+      - NEXT_PUBLIC_API_URL=https://api.gestionpose.com.ar
+    networks:
+      - pose_network
+    labels:
+      - "traefik.enable=true"
+      # El Frontend responderá en el dominio principal y con 'www'
+      - "traefik.http.routers.frontend.rule=Host(`gestionpose.com.ar`) || Host(`www.gestionpose.com.ar`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+# Nos conectamos a la red global que creamos para Traefik
+networks:
+  pose_network:
+    external: true
