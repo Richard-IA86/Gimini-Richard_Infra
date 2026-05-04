@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   api:
     # GitHub Action construirá y subirá esta imagen, y Hetzner la descargará
