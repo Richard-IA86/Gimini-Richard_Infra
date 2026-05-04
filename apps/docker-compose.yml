@@ -10,11 +10,12 @@ services:
       # DB_HOST=172.18.0.1: gateway del bridge Docker hacia PostgreSQL nativo del host.
       # 10.10.0.1 (WireGuard) NO es accesible desde contenedores Docker.
       # pg_hba.conf y UFW permiten 172.18.0.0/16 — fix aplicado 2026-05-04.
+      # DB_USER/DB_NAME alineados a dw_grupopose_b52_prod (ETL DataPipeline).
       - DB_HOST=172.18.0.1
       - DB_PORT=5432
-      - DB_USER=pose_app
+      - DB_USER=pose_admin
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=pose_db
+      - DB_NAME=dw_grupopose_b52_prod
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     networks:
       - pose_network
