@@ -41,7 +41,7 @@ http:
     basic-auth:
       basicAuth:
         users:
-          - "gestion_admin:$$2b$$12$$BgF0u68LzAdOyTUq68sy5.8Z3EYJovMo5EjfXkFHbbr1BMeTxGyHm"
+          - "gestion_admin:$2b$12$BgF0u68LzAdOyTUq68sy5.8Z3EYJovMo5EjfXkFHbbr1BMeTxGyHm"
 
   services:
     api-svc:
