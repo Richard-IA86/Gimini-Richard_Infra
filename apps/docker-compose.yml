@@ -7,8 +7,10 @@ services:
     container_name: pose_api
     restart: always
     environment:
-      # Conexión a la DB nativa en el servidor vía WireGuard (10.10.0.1)
-      - DB_HOST=10.10.0.1
+      # DB_HOST=172.18.0.1: gateway del bridge Docker hacia PostgreSQL nativo del host.
+      # 10.10.0.1 (WireGuard) NO es accesible desde contenedores Docker.
+      # pg_hba.conf y UFW permiten 172.18.0.0/16 — fix aplicado 2026-05-04.
+      - DB_HOST=172.18.0.1
       - DB_PORT=5432
       - DB_USER=pose_app
       - DB_PASSWORD=${DB_PASSWORD}

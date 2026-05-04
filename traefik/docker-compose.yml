@@ -1,39 +1,34 @@
-version: '3.8'
+# NOTA: Docker Provider eliminado por incompatibilidad Docker 29.x (API mínima 1.40).
+# Traefik v3.3 + File Provider. Rutas en config/dynamic.yaml.
+# Fix aplicado 2026-05-04 — ver Contexto_DevOps.md sección Incidente 521.
 
 services:
   traefik:
-    image: traefik:v2.10
+    image: traefik:v3.3
     container_name: pose_gateway
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
     ports:
-      - "80:80"     # Puerto HTTP (Web normal)
-      - "443:443"   # Puerto HTTPS (Web segura)
+      - "80:80"
+      - "443:443"
     command:
-      - "--api.insecure=false" # Desactiva el dashboard público por seguridad
-      - "--providers.docker=true" # Le dice a Traefik que escuche a Docker
-      - "--providers.docker.exposedbydefault=false" # No expone contenedores automáticamente
-      
-      # Redirección automática de HTTP a HTTPS
+      - "--api.insecure=false"
+      - "--providers.file.directory=/config"
+      - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       - "--entrypoints.websecure.address=:443"
-      
-      # Configuración de Let's Encrypt (Certificados SSL gratuitos)
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # ACME HTTP-01 (TLS-ALPN-01 incompatible con Cloudflare proxy)
+      - "--certificatesresolvers.myresolver.acme.httpChallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpChallenge.entryPoint=web"
       - "--certificatesresolvers.myresolver.acme.email=Richard.r.ia86@gmail.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     volumes:
-      # Permite a Traefik leer qué contenedores se encienden o apagan
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      # Persiste los certificados SSL para que no se borren si Traefik se reinicia
       - "./letsencrypt:/letsencrypt"
+      - "./config:/config:ro"
     networks:
       - pose_network
 
-# Definimos una red global externa para que la API y el Frontend puedan conectarse a Traefik
 networks:
   pose_network:
     external: true
