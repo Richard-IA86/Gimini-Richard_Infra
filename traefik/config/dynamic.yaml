@@ -17,6 +17,8 @@ http:
       service: frontend-svc
       entryPoints:
         - websecure
+      middlewares:
+        - basic-auth
       tls:
         certResolver: myresolver
 
@@ -33,6 +35,13 @@ http:
       redirectScheme:
         scheme: https
         permanent: true
+
+    # Login temporal genérico — migrar a tabla BD cuando haya
+    # sistema de usuarios definitivo.
+    basic-auth:
+      basicAuth:
+        users:
+          - "gestion_admin:$$2b$$12$$BgF0u68LzAdOyTUq68sy5.8Z3EYJovMo5EjfXkFHbbr1BMeTxGyHm"
 
   services:
     api-svc:
