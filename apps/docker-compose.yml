@@ -15,6 +15,10 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=dw_grupopose_b52_prod
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      # Directorio persistente para cache de dashboard y reportes.
+      - POSE_DATA_DIR=/app/data
+    volumes:
+      - pose_data:/app/data
     networks:
       - pose_network
     labels:
@@ -47,3 +51,8 @@ services:
 networks:
   pose_network:
     external: true
+
+volumes:
+  pose_data:
+    # Volumen persistente para cache dashboard + reportes xlsx.
+    # Sobrevive a docker compose up -d (restart/redeploy sin perder cache).
