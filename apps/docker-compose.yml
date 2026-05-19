@@ -1,7 +1,8 @@
 services:
   api:
-    # GitHub Action construirá y subirá esta imagen, y Hetzner la descargará
-    image: ghcr.io/richard-ia86/pose_api:latest
+    # Build local desde /opt/pose/Pose_API (git pull + docker compose up -d).
+    # Opción B (CI/CD GHCR) planificada para 2026-06-01.
+    build: ./Pose_API
     container_name: pose_api
     restart: always
     environment:
@@ -30,8 +31,8 @@ services:
       - "traefik.http.services.api.loadbalancer.server.port=8000"
 
   frontend:
-    # Igual que la API, la imagen vendrá de GitHub
-    image: ghcr.io/richard-ia86/pose_frontend:latest
+    # Build local desde /opt/pose/Pose_Frontend (git pull + docker compose up -d).
+    build: ./Pose_Frontend
     container_name: pose_frontend
     restart: always
     environment:
@@ -56,3 +57,4 @@ volumes:
   pose_data:
     # Volumen persistente para cache dashboard + reportes xlsx.
     # Sobrevive a docker compose up -d (restart/redeploy sin perder cache).
+    # Creado: 2026-05-18. Contiene pose_dashboard_data.json y pose_reporte_diario.xlsx.
