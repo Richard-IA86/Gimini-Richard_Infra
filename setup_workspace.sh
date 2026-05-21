@@ -224,9 +224,10 @@ EOF
     echo "  + $user → $client_ip (activo en caliente)"
 done
 
-# Sincronizar estado en memoria con wg0.conf
-# (reconcilia cualquier diferencia sin reiniciar)
-wg syncconf "$WG_IFACE" /etc/wireguard/wg0.conf
+# Sincronizar estado en memoria con wg0.conf.
+# wg syncconf solo acepta secciones [Peer] — filtrar [Interface].
+awk '/^\[Peer\]/,0' /etc/wireguard/wg0.conf \
+    | wg syncconf "$WG_IFACE" /dev/stdin
 echo "      wg syncconf OK — peers activos:"
 wg show "$WG_IFACE" allowed-ips
 
