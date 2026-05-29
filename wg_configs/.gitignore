@@ -1,0 +1,3 @@
+*.privkey
+wg0_*.conf
+wg0.conf
